@@ -10,27 +10,15 @@ import (
 	"strconv"
 )
 
-type Client struct {
-	host     string
-	basePath string
-	client   http.Client
-}
-
 const (
 	getUpdatesMethod  = "getUpdates"
 	sendMessageMethod = "sendMessage"
 )
 
-func (c *Client) SendMessage(chatID int, text string) error {
-	q := url.Values{}
-	q.Add("chat_id", strconv.Itoa(chatID))
-	q.Add("text", text)
-
-	_, err := c.doRequest(sendMessageMethod, q)
-	if err != nil {
-		return e.Wrap("can't send message", err)
-	}
-	return nil
+type Client struct {
+	host     string
+	basePath string
+	client   http.Client
 }
 
 func New(host string, token string) Client {
@@ -47,6 +35,7 @@ func newBasePath(token string) string {
 }
 
 func (c *Client) Updates(offset int, limit int) ([]Update, error) {
+	// Обработка получения сообщений
 	q := url.Values{}
 	q.Add("offset", strconv.Itoa(offset))
 	q.Add("limit", strconv.Itoa(limit))
@@ -63,6 +52,19 @@ func (c *Client) Updates(offset int, limit int) ([]Update, error) {
 	}
 
 	return res.Result, nil
+}
+
+func (c *Client) SendMessage(chatID int, text string) error {
+	// Отправка сообщений
+	q := url.Values{}
+	q.Add("chat_id", strconv.Itoa(chatID))
+	q.Add("text", text)
+
+	_, err := c.doRequest(sendMessageMethod, q)
+	if err != nil {
+		return e.Wrap("can't send message", err)
+	}
+	return nil
 }
 
 func (c *Client) doRequest(method string, query url.Values) ([]byte, error) {
