@@ -21,13 +21,13 @@ type Client struct {
 	client   http.Client
 }
 
-func New(host string, token string) Client {
+func New(host string, token string) *Client {
 	client := Client{
 		host:     host,
 		basePath: newBasePath(token),
 		client:   http.Client{},
 	}
-	return client
+	return &client
 }
 
 func newBasePath(token string) string {
